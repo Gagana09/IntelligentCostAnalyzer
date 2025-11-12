@@ -1,25 +1,18 @@
-import random
-import json
+import pandas as pd
+import numpy as np
+from datetime import datetime, timedelta
 
-# Define applications and microservices
-apps = {
-    "AuthAPI": ["LoginService", "TokenService"],
-    "AnalyticsService": ["DataIngest", "ReportService"],
-    "DatabaseCluster": ["DBCluster1", "DBCluster2"],
-    "FrontendApp": ["WebApp", "MobileApp"]
-}
+apps = ["AuthAPI", "AnalyticsService", "DatabaseCluster", "FrontendApp", "PaymentGateway"]
+days = 60
 
-# Generate simulated cost data for 30 days
-cost_data = {}
+data = []
+for app in apps:
+    base_cost = np.random.randint(2000, 4000)
+    for i in range(days):
+        date = datetime.today() - timedelta(days=days - i)
+        daily_cost = base_cost * (1.03 ** i) + np.random.randint(-100, 100)
+        data.append([date.strftime("%Y-%m-%d"), app, int(daily_cost)])
 
-for app, services in apps.items():
-    cost_data[app] = {}
-    for service in services:
-        daily_costs = [round(random.uniform(100, 500), 2) for _ in range(30)]
-        cost_data[app][service] = daily_costs
-
-# Save to JSON
-with open("sample_cost_data.json", "w") as f:
-    json.dump(cost_data, f, indent=4)
-
-print("Sample cost data generated and saved as sample_cost_data.json")
+df = pd.DataFrame(data, columns=["Date", "AppName", "Cost"])
+df.to_csv("synthetic_cost_data_growth.csv", index=False)
+print("📈 synthetic_cost_data_growth.csv generated with exponential trend")
